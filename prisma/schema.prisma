@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -13,6 +12,82 @@ model User {
   email String   @unique
   password String
   name  String?
+  bankingDetails BankingDetails[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model BankingDetails {
+  id String @id @default(uuid())
+  bankName String
+  accountHolderName String
+  accountType String
+  accountNumber String
+  ifscCode String?
+  registeredMobileNumber String?
+  registeredEmail String?
+  remarks String?
+  cardDetails CardDetails[]
+  upiDetails UpiDetails[]
+  mobileBankingDetails MobileBankingDetails[]
+  userId String
+  user User @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model CardDetails {
+  id String @id @default(uuid())
+  nameOnCard String
+  cardNumber String
+  cardExpiryDate String
+  cardCvv String
+  cardPin String
+  remarks String?
+  bankingDetailsId String
+  bankingDetails BankingDetails @relation(fields: [bankingDetailsId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([bankingDetailsId])
+}
+
+model UpiDetails {
+  id String @id @default(uuid())
+  upiPin String
+  bankingDetailsId String
+  bankingDetails BankingDetails @relation(fields: [bankingDetailsId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([bankingDetailsId])
+}
+
+model MobileBankingDetails {
+  id String @id @default(uuid())
+  loginPin String
+  transactionPin String
+  customFields MobileBankingCustomField[]
+  bankingDetailsId String
+  bankingDetails BankingDetails @relation(fields: [bankingDetailsId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([bankingDetailsId])
+}
+
+model MobileBankingCustomField {
+  id String @id @default(uuid())
+  fieldName String
+  fieldValue String
+  mobileBankingDetailsId String
+  mobileBankingDetails MobileBankingDetails @relation(fields: [mobileBankingDetailsId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([mobileBankingDetailsId])
+}
+
+
